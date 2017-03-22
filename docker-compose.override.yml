@@ -1,0 +1,12 @@
+version: '2.1'
+services:
+  apache:
+    ports:
+      - "8183:80"
+
+  app:
+    environment:
+      MAKE_TASK: development
+      SYMFONY_ENV: dev
+    volumes:
+      - .:/usr/src/app

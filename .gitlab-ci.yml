@@ -1,0 +1,161 @@
+image: registry.gitlab.com/thecodeine/environment:docker-compose
+
+services:
+  - docker:dind
+
+stages:
+  - prepare
+  - build
+  - test
+  - release
+  - review
+  - deploy
+  - cleanup
+
+variables:
+  DOCKER_DRIVER: overlay
+  BUILD_IMAGE: $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
+  COMPOSER_ARGS: "-f docker-compose.yml -f docker-compose.build.yml"
+
+before_script:
+  - &docker-login
+    docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY_IMAGE
+
+prepare:
+  before_script: []
+  image: registry.gitlab.com/thecodeine-docker/php:php-fpm-node-ruby
+  services: []
+  stage: prepare
+  script:
+    - make prepare
+  cache:
+    key: "$CI_BUILD_REF_NAME"
+    paths:
+      - bin/
+      - vendor/
+  artifacts:
+    paths:
+      - bin/
+      - vendor/
+    expire_in: 1 day
+  only:
+    - branches
+
+.build-and-push: &build-and-push
+  script:
+    - *docker-login
+    - export COMPOSER_ARGS=${COMPOSER_ARGS:-DOCKER_ENV_COMPOSER_ARGS}
+    - docker-compose $COMPOSER_ARGS build --pull
+    - docker-compose $COMPOSER_ARGS push
+
+#build-test:
+#  <<: *build-and-push
+#  stage: build
+#  variables:
+#    BUILD_TASK: $CI_BUILD_NAME
+#    SYMFONY_ENV: test
+#  before_script:
+#    - export IMAGE="${BUILD_IMAGE:-DOCKER_ENV_BUILD_IMAGE}-test"
+#  dependencies:
+#    - prepare
+#  only:
+#    - branches
+
+.dependencies-test: &dependencies-test
+  before_script:
+    - *docker-login
+    - export TEST_IMAGE="${BUILD_IMAGE:-DOCKER_ENV_BUILD_IMAGE}-test"
+    - docker pull $TEST_IMAGE
+
+#.test: &test
+#  <<: *dependencies-test
+#  stage: test
+#  script:
+#    - export IMAGE=$TEST_IMAGE
+#    - export MAKE_TASK=$CI_BUILD_NAME
+#    - ./docker-test.sh $ARGS
+#  only:
+#    - branches
+#
+#test:
+#  <<: *test
+#  variables:
+#    ARGS: --no-deps app
+
+.release: &release
+  <<: *build-and-push
+  before_script: []
+  stage: release
+  dependencies:
+    - prepare
+
+release-branch:
+  <<: *release
+  variables:
+    IMAGE: $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
+  only:
+    - branches
+  except:
+    - devel
+
+release-devel:
+  <<: *release
+  variables:
+    IMAGE: $CI_REGISTRY_IMAGE:latest
+  only:
+    - devel
+
+.deploy: &deploy
+  image: registry.gitlab.com/thecodeine/environment:docker-machine
+  script:
+    - export COMPOSER_ARGS=${COMPOSER_ARGS:-DOCKER_ENV_COMPOSER_ARGS}
+    - docker-compose $COMPOSER_ARGS pull
+    - docker-compose $COMPOSER_ARGS -p $PROJECT kill app
+    - docker-compose $COMPOSER_ARGS -p $PROJECT rm -fv app
+    - docker-compose $COMPOSER_ARGS -p $PROJECT up -d
+
+review:
+  <<: *deploy
+  stage: review
+  variables:
+    VIRTUAL_HOST: $CI_BUILD_REF_NAME-$CI_PROJECT_NAME.$HOST
+    IMAGE: $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
+    PROJECT: $CI_BUILD_REF_NAME-$CI_PROJECT_NAME
+  environment:
+    name: review/$CI_BUILD_REF_NAME
+    url: http://$CI_BUILD_REF_NAME-$CI_PROJECT_NAME.$HOST
+    on_stop: stop-review
+  only:
+    - branches
+  except:
+    - devel
+
+deploy-devel:
+  <<: *deploy
+  stage: deploy
+  variables:
+    VIRTUAL_HOST: $CI_PROJECT_NAME.$HOST
+    IMAGE: $CI_REGISTRY_IMAGE:latest
+    PROJECT: $CI_PROJECT_NAME
+  environment:
+    name: staging
+    url: http://$CI_PROJECT_NAME.$HOST
+  only:
+    - devel
+
+stop-review:
+  <<: *deploy
+  stage: cleanup
+  variables:
+    IMAGE: $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
+    PROJECT: $CI_BUILD_REF_NAME-$CI_PROJECT_NAME
+  script:
+    - docker-compose ${COMPOSER_ARGS:-DOCKER_ENV_COMPOSER_ARGS} -p $PROJECT down -v
+  environment:
+    name: review/$CI_BUILD_REF_NAME
+    action: stop
+  when: manual
+  only:
+    - branches
+  except:
+    - devel

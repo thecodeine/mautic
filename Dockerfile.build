@@ -1,10 +1,11 @@
-wFROM registry.gitlab.com/thecodeine-docker/php:7.0-fpm
+FROM registry.gitlab.com/thecodeine-docker/php:7.0-fpm
 
 ARG BUILD_TASK
 ARG SYMFONY_ENV
 ENV SYMFONY_ENV $SYMFONY_ENV
 
-RUN echo -e "always_populate_raw_post_data =-1" >> $CUSTOM_PHP_INI_PATH
+RUN echo -e "always_populate_raw_post_data = -1" >> $CUSTOM_PHP_INI_PATH \
+	&& echo -e "popcache.validate_timestamps=0" >> $CUSTOM_PHP_INI_PATH
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app

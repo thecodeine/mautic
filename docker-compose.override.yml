@@ -10,3 +10,7 @@ services:
       SYMFONY_ENV: dev
     volumes:
       - .:/usr/src/app
+
+  db:
+    ports:
+      - "8336:3306"

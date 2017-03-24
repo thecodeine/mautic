@@ -48,18 +48,18 @@ prepare:
     - docker-compose $COMPOSER_ARGS build --pull
     - docker-compose $COMPOSER_ARGS push
 
-#build-test:
-#  <<: *build-and-push
-#  stage: build
-#  variables:
-#    BUILD_TASK: $CI_BUILD_NAME
-#    SYMFONY_ENV: test
-#  before_script:
-#    - export IMAGE="${BUILD_IMAGE:-DOCKER_ENV_BUILD_IMAGE}-test"
-#  dependencies:
-#    - prepare
-#  only:
-#    - branches
+build-test:
+  <<: *build-and-push
+  stage: build
+  variables:
+    BUILD_TASK: $CI_BUILD_NAME
+    SYMFONY_ENV: test
+  before_script:
+    - export IMAGE="${BUILD_IMAGE:-DOCKER_ENV_BUILD_IMAGE}-test"
+  dependencies:
+    - prepare
+  only:
+    - branches
 
 .dependencies-test: &dependencies-test
   before_script:
@@ -67,20 +67,20 @@ prepare:
     - export TEST_IMAGE="${BUILD_IMAGE:-DOCKER_ENV_BUILD_IMAGE}-test"
     - docker pull $TEST_IMAGE
 
-#.test: &test
-#  <<: *dependencies-test
-#  stage: test
-#  script:
-#    - export IMAGE=$TEST_IMAGE
-#    - export MAKE_TASK=$CI_BUILD_NAME
-#    - ./docker-test.sh $ARGS
-#  only:
-#    - branches
-#
-#test:
-#  <<: *test
-#  variables:
-#    ARGS: --no-deps app
+.test: &test
+  <<: *dependencies-test
+  stage: test
+  script:
+    - export IMAGE=$TEST_IMAGE
+    - export MAKE_TASK=$CI_BUILD_NAME
+    - ./docker-test.sh $ARGS
+  only:
+    - branches
+
+test:
+  <<: *test
+  variables:
+    ARGS: --no-deps app
 
 .release: &release
   <<: *build-and-push

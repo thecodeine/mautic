@@ -1,11 +1,11 @@
 version: '2.1'
 services:
   apache:
+    environment:
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
     networks:
       - default
       - proxy
-    environment:
-      VIRTUAL_HOST: ${VIRTUAL_HOST}
     restart: unless-stopped
 
   app:

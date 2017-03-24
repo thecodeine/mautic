@@ -8,6 +8,7 @@ services:
       - WEB_DOCUMENT_ROOT=/usr/src/app
     volumes_from:
       - app
+    restart: on-failure:3
 
   db:
     image: mysql:5.7

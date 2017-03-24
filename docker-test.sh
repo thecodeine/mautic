@@ -4,7 +4,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
-PROJECT=`echo $(basename $PWD)_test | tr '[:upper:]' '[:lower:]' | tr -cd '[[a-z0-9]]'`
+PROJECT=`echo test_$(basename $PWD)_${CI_JOB_ID}_$(date +%s%N) | tr '[:upper:]' '[:lower:]' | tr -cd '[[a-z0-9]]'`
 SYMFONY_ENV=test
 
 compose () {

@@ -1,7 +1,10 @@
 .*
+.github
 !.gitignore
 !.htaccess
 !.gitkeep
+!.dockerignore
+!.gitlab-ci.yml
 /app/bootstrap*
 /app/tests.bootstrap*
 /app/bundles/CoreBundle/Assets/css/app/less/**/*.css
@@ -44,3 +47,4 @@
 !/media/images/.htaccess
 /media/dashboards/*
 !/media/dashboards/*.json
+.idea

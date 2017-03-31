@@ -1,16 +1,49 @@
 version: '2.1'
 services:
+  bg-sync:
+    image: cweagans/bg-sync
+    command: /bin/sh -c "rm -f /root/unison.log && bg-sync"
+    volumes:
+      - .:/source
+      - app-data:/usr/src/app
+    environment:
+      SYNC_SOURCE: /source
+      SYNC_DESTINATION: /usr/src/app
+      SYNC_MAX_INOTIFY_WATCHES: 40000
+      SYNC_VERBOSE: 1
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "
+        if grep -Fq \"Synchronization complete\" /root/unison.log; then exit 0; else exit 1; fi
+        "
+      interval: 5s
+      timeout: 3s
+      retries: 100
+    privileged: true
+    restart: on-failure:3
+
   apache:
     ports:
       - "8183:80"
+    depends_on:
+      - app
+    volumes:
+      - app-data:/usr/src/app
 
   app:
     environment:
       MAKE_TASK: development
       SYMFONY_ENV: dev
+    depends_on:
+      bg-sync:
+        condition: service_healthy
     volumes:
-      - .:/usr/src/app
+      - app-data:/usr/src/app
 
   db:
     ports:
       - "8336:3306"
+
+volumes:
+  app-data:

@@ -32,7 +32,7 @@ test: build-config-if-not-exists
 # Development
 
 .PHONY: development
-development: build-config-if-not-exists clear composer-dev
+development: build-config-if-not-exists clear composer-dev permissions
 
 ### Deploy
 

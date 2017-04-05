@@ -3,6 +3,8 @@ services:
   apache:
     environment:
       VIRTUAL_HOST: ${VIRTUAL_HOST}
+    volumes_from:
+      - app
     networks:
       - default
       - proxy
@@ -16,8 +18,6 @@ services:
       args:
         BUILD_TASK: ${BUILD_TASK:-build}
         SYMFONY_ENV: ${SYMFONY_ENV:-prod}
-    environment:
-      VIRTUAL_HOST: ${VIRTUAL_HOST}
     volumes: ["/usr/src/app"]
     restart: unless-stopped
 

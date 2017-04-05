@@ -18,7 +18,7 @@ services:
       args:
         BUILD_TASK: ${BUILD_TASK:-build}
         SYMFONY_ENV: ${SYMFONY_ENV:-prod}
-    volumes: ["/usr/src/app/app/logs", "/usr/src/app/web", "/usr/src/app/templates"]
+    volumes: ["/usr/src/app"]
     restart: unless-stopped
 
   db:

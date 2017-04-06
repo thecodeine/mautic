@@ -64,7 +64,7 @@ fix:
 permissions:
 	mkdir -p app/cache app/logs
 	touch app/config/local.php
-	chown -R www-data:www-data app/cache app/logs app/config/local.php
+	chown -R www-data:www-data app/cache app/logs app/config/local.php media/dashboards
 
 ## Composer
 

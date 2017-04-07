@@ -36,16 +36,4 @@ class Version20170322083012 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE '.$this->prefix.'campaign_event_daily_send_log ADD CONSTRAINT '.$this->generatePropertyName('campaign_event_daily_send_log', 'fk', ['event_id']).' FOREIGN KEY (event_id) REFERENCES '.$this->prefix.'campaign_events (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE '.$this->prefix.'campaign_lead_event_log ADD is_queued TINYINT(1) NOT NULL');
     }
-
-    /**
-     * @param Schema $schema
-     */
-    public function down(Schema $schema)
-    {
-        // this down() migration is auto-generated, please modify it to your needs
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
-
-        $this->addSql('DROP TABLE '.$this->prefix.'campaign_event_daily_send_log');
-        $this->addSql('ALTER TABLE '.$this->prefix.'campaign_lead_event_log DROP is_queued');
-    }
 }

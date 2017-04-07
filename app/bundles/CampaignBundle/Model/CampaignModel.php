@@ -1269,7 +1269,6 @@ class CampaignModel extends CommonFormModel
 
             if ($events) {
                 foreach ($events as $type => $eventIds) {
-                    $filter['is_queued']    = 0;
                     $filter['event_id']     = $eventIds;
                     $q                      = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
                     $rawData                = $q->execute()->fetchAll();
@@ -1278,7 +1277,7 @@ class CampaignModel extends CommonFormModel
                         $chart->setDataset($this->translator->trans('mautic.campaign.'.$type), $triggers);
                     }
                 }
-                unset($filter['event_id'], $filter['is_queued']);
+                unset($filter['event_id']);
             }
         }
 

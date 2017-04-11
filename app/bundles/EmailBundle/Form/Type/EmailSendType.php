@@ -40,22 +40,24 @@ class EmailSendType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'daily_max_limit',
-            'text',
-            [
-                'label'       => 'mautic.email.send.daily_max_limit',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => ['class' => 'form-control'],
-                'data'        => isset($options['data']['daily_max_limit']) ? $options['data']['daily_max_limit'] : 0,
-                'constraints' => [
-                    new Range(
-                        ['min' => 0]
-                    ),
-                    new NotBlank(),
-                ],
-            ]
-        );
+        if (!empty($options['with_daily_max_limit'])) {
+            $builder->add(
+                'daily_max_limit',
+                'text',
+                [
+                    'label' => 'mautic.email.send.daily_max_limit',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr' => ['class' => 'form-control'],
+                    'data' => isset($options['data']['daily_max_limit']) ? $options['data']['daily_max_limit'] : 0,
+                    'constraints' => [
+                        new Range(
+                            ['min' => 0]
+                        ),
+                        new NotBlank(),
+                    ],
+                ]
+            );
+        }
 
         $builder->add(
             'email',
@@ -214,10 +216,11 @@ class EmailSendType extends AbstractType
         $resolver->setDefaults(
             [
                 'with_email_types' => false,
+                'with_daily_max_limit' => false
             ]
         );
 
-        $resolver->setDefined(['update_select', 'with_email_types']);
+        $resolver->setDefined(['update_select', 'with_email_types', 'with_daily_max_limit']);
     }
 
     /**

@@ -51,7 +51,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '-thecodeine.1';
+    const EXTRA_VERSION = '-thecodeine.2';
 
     /**
      * @var array

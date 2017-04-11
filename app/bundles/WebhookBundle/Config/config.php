@@ -47,6 +47,10 @@ return [
                 'class' => 'Mautic\WebhookBundle\Form\Type\ConfigType',
                 'alias' => 'webhookconfig',
             ],
+            'mautic.form.type.webhooktrigger' => [
+                'class' => 'Mautic\WebhookBundle\Form\Type\WebhookTriggerType',
+                'alias' => 'webhook_trigger',
+            ],
         ],
         'events' => [
             'mautic.webhook.lead.subscriber' => [
@@ -63,6 +67,9 @@ return [
             ],
             'mautic.webhook.config.subscriber' => [
                 'class' => 'Mautic\WebhookBundle\EventListener\ConfigSubscriber',
+            ],
+            'mautic.webhook.points.subscriber' => [
+                'class' => 'Mautic\WebhookBundle\EventListener\PointSubscriber',
             ],
             'mautic.webhook.audit.subscriber' => [
                 'class'     => 'Mautic\WebhookBundle\EventListener\WebhookSubscriber',
@@ -84,6 +91,24 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'jms_serializer',
+                ],
+            ],
+            'mautic.webhook.model.webhook_trigger_queue' => [
+                'class'     => 'Mautic\WebhookBundle\Model\WebhookTriggerQueueModel',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+        ],
+        'commands' => [
+            'mautic.webhook.command.webhook_trigger_queue' => [
+                'class'     => 'Mautic\WebhookBundle\Command\ProcessWebhookTriggerQueuesCommand',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.factory',
+                ],
+                'tags' => [
+                    'console.command',
                 ],
             ],
         ],

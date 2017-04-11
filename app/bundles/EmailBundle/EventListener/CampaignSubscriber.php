@@ -117,7 +117,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'description'     => 'mautic.email.campaign.event.send_descr',
                 'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formType'        => 'emailsend_list',
-                'formTypeOptions' => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
+                'formTypeOptions' => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true, 'with_daily_max_limit' => true],
                 'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
                 'channel'         => 'email',
                 'channelIdField'  => 'email',

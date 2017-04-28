@@ -112,6 +112,17 @@ if (!isset($args['repackage'])) {
         'index_dev.php',
         'package.json',
         'upgrade.php',
+
+        '.dockerignore',
+        '.gitlab-ci.yml',
+        'docker-compose.build.yml',
+        'docker-compose.override.yml',
+        'docker-compose.yml',
+        'docker-php-entrypoint.sh',
+        'docker-test.sh',
+        'Dockerfile',
+        'Dockerfile.build',
+        'Makefile',
     ];
 
     // Create a flag to check if the vendors changed

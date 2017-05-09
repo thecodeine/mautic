@@ -82,7 +82,7 @@ docker-compose:
   dependencies:
     - docker-compose
 
-build-packages:
+build-package:
   image: registry.gitlab.com/thecodeine-docker/php:7.0-fpm
   stage: build
   variables:
@@ -92,8 +92,8 @@ build-packages:
   script:
     - php build/package_release.php
     - mkdir packages
-    - mv build/packages/*.zip packages/
-    - rm packages/*update.zip
+    - mv build/packages/*update.zip packages/
+    - for file in packages/*update.zip; do mv -v "$file" "${file/-update/}"; done;
   only:
     - tags
   cache:
@@ -104,7 +104,7 @@ build-packages:
   artifacts:
     paths:
       - packages/*
-    expire_in: 1 day
+    expire_in: 3 mos
 
 build-test:
   <<: *build-and-push

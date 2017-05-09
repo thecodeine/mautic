@@ -3,8 +3,6 @@ services:
   apache:
     environment:
       VIRTUAL_HOST: ${VIRTUAL_HOST}
-    volumes_from:
-      - app
     networks:
       - default
       - proxy

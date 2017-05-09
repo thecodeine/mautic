@@ -82,6 +82,30 @@ docker-compose:
   dependencies:
     - docker-compose
 
+build-packages:
+  image: registry.gitlab.com/thecodeine-docker/php:7.0-fpm
+  stage: build
+  variables:
+    GIT_STRATEGY: clone
+  before_script:
+    - make prepare
+  script:
+    - php build/package_release.php
+    - mkdir packages
+    - mv build/packages/*.zip packages/
+    - rm packages/*update.zip
+  only:
+    - tags
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - bin/
+      - vendor/
+  artifacts:
+    paths:
+      - packages/*
+    expire_in: 1 day
+
 build-test:
   <<: *build-and-push
   <<: *dependencies-prepare
@@ -151,8 +175,7 @@ release-master:
   script:
     - export DOCKER_COMPOSE_ARGS=${DOCKER_COMPOSE_ARGS:-$DOCKER_ENV_DOCKER_COMPOSE_ARGS}
     - docker-compose $DOCKER_COMPOSE_ARGS pull
-    - docker-compose $DOCKER_COMPOSE_ARGS -p $PROJECT kill app
-    - docker-compose $DOCKER_COMPOSE_ARGS -p $PROJECT rm -fv app
+    - docker-compose $DOCKER_COMPOSE_ARGS -p $PROJECT down -v
     - docker-compose $DOCKER_COMPOSE_ARGS -p $PROJECT up -d
 
 review:

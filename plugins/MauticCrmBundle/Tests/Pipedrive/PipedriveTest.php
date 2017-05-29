@@ -31,6 +31,8 @@ abstract class PipedriveTest extends MauticFunctionalTestCase
     {
         unset($GLOBALS['requests']);
 
+        self::$class = null;
+
         parent::tearDown();
     }
 

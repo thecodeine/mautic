@@ -42,6 +42,7 @@ abstract class MauticFunctionalTestCase extends WebTestCase
     private $params = [
         'secret_key' => '68c7e75470c02cba06dd543431411e0de94e04fdf2b3a2eac05957060edb66d0',
         'mailer_from_name' => 'Admin User',
+        'db_driver' => 'pdo_mysql',
     ];
 
     public function setUp()

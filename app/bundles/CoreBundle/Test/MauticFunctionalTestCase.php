@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
 use Mautic\InstallBundle\Helper\SchemaHelper;
-use MauticPlugin\MauticCrmBundle\Tests\DoctrineExtensions\TablePrefix;
+use Mautic\CoreBundle\Test\DoctrineExtensions\TablePrefix;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -54,6 +54,60 @@ abstract class MauticFunctionalTestCase extends WebTestCase
         $this->container = $this->client->getContainer();
         $this->em        = $this->container->get('doctrine')->getManager();
 
+        $this->mockServices();
+
+        if (file_exists($this->getOriginalDatabasePath())) {
+            $this->createDatabaseFromFile();
+        } else {
+            $this->createDatabase();
+            $this->applyMigrations();
+            $this->installDatabaseFixtures();
+            $this->backupOrginalDatabase();
+        }
+    }
+
+    protected function tearDown()
+    {
+        $this->em->close();
+
+        parent::tearDown();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected static function getKernelClass()
+    {
+        if (isset($_SERVER['KERNEL_DIR'])) {
+            $dir = $_SERVER['KERNEL_DIR'];
+
+            if (!is_dir($dir)) {
+                $phpUnitDir = static::getPhpUnitXmlDir();
+                if (is_dir("$phpUnitDir/$dir")) {
+                    $dir = "$phpUnitDir/$dir";
+                }
+            }
+        } else {
+            $dir = static::getPhpUnitXmlDir();
+        }
+
+        $finder = new Finder();
+        $finder->name('*TestKernel.php')->depth(0)->in($dir);
+        $results = iterator_to_array($finder);
+        if (!count($results)) {
+            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
+        }
+
+        $file  = current($results);
+        $class = $file->getBasename('.php');
+
+        require_once $file;
+
+        return $class;
+    }
+
+    private function mockServices()
+    {
         $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
             ->setMethods(['getParameter', 'hasParameter'])
@@ -138,22 +192,6 @@ abstract class MauticFunctionalTestCase extends WebTestCase
         $this->container->set('mautic.helper.core_parameters', $coreParametersHelper);
         //uncomment to develop tests faster
 //        $this->container->set('templating', $templateHelper);
-
-        if (file_exists($this->getOriginalDatabasePath())) {
-            $this->createDatabaseFromFile();
-        } else {
-            $this->createDatabase();
-            $this->applyMigrations();
-            $this->installDatabaseFixtures();
-            $this->backupOrginalDatabase();
-        }
-    }
-
-    protected function tearDown()
-    {
-        $this->em->close();
-
-        parent::tearDown();
     }
 
     private function createDatabase()
@@ -230,38 +268,5 @@ abstract class MauticFunctionalTestCase extends WebTestCase
     private function getDatabasePath()
     {
         return $this->container->get('doctrine')->getConnection()->getParams()['path'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected static function getKernelClass()
-    {
-        if (isset($_SERVER['KERNEL_DIR'])) {
-            $dir = $_SERVER['KERNEL_DIR'];
-
-            if (!is_dir($dir)) {
-                $phpUnitDir = static::getPhpUnitXmlDir();
-                if (is_dir("$phpUnitDir/$dir")) {
-                    $dir = "$phpUnitDir/$dir";
-                }
-            }
-        } else {
-            $dir = static::getPhpUnitXmlDir();
-        }
-
-        $finder = new Finder();
-        $finder->name('*TestKernel.php')->depth(0)->in($dir);
-        $results = iterator_to_array($finder);
-        if (!count($results)) {
-            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
-        }
-
-        $file  = current($results);
-        $class = $file->getBasename('.php');
-
-        require_once $file;
-
-        return $class;
     }
 }

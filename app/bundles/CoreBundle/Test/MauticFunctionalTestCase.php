@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\CoreBundle\Test\DoctrineExtensions\TablePrefix;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
@@ -38,10 +37,6 @@ abstract class MauticFunctionalTestCase extends WebTestCase
      * @var Client
      */
     protected $client;
-
-    private $params = [
-        'secret_key' => '68c7e75470c02cba06dd543431411e0de94e04fdf2b3a2eac05957060edb66d0',
-    ];
 
     public function setUp()
     {
@@ -106,52 +101,6 @@ abstract class MauticFunctionalTestCase extends WebTestCase
 
     private function mockServices()
     {
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getParameter', 'hasParameter'])
-            ->getMock();
-
-        $coreParametersHelper
-            ->expects($this->any())
-            ->method('getParameter')
-            ->willReturnCallback(function ($name, $default = null) {
-                if (isset($this->params[$name])) {
-                    return $this->params[$name];
-                }
-
-                $pb = $this->container->getParameterBag();
-
-                if ($name === 'db_table_prefix' && defined('MAUTIC_TABLE_PREFIX')) {
-                    //use the constant in case in the installer
-                    return MAUTIC_TABLE_PREFIX;
-                }
-
-                if ($pb->has('mautic.'.$name)) {
-                    // Decode %%
-                    $value = str_replace('%%', '%', $pb->get('mautic.'.$name));
-
-                    return $value;
-                }
-
-                // Last ditch effort in case we're getting non-mautic params
-                if ($pb->has($name)) {
-                    return $pb->get($name);
-                }
-
-                return $default;
-            });
-
-        $coreParametersHelper
-            ->expects($this->any())
-            ->method('hasParameter')
-            ->willReturnCallback(function ($name) {
-                if (isset($this->params[$name])) {
-                    return true;
-                }
-
-                return $this->container->getParameterBag()->has('mautic.'.$name);
-            });
-
         $cookieHelper = $this->getMockBuilder(CookieHelper::class)
             ->disableOriginalConstructor()
             ->setMethods(['setCookie', 'setCharset'])
@@ -159,20 +108,6 @@ abstract class MauticFunctionalTestCase extends WebTestCase
 
         $cookieHelper->expects($this->any())
             ->method('setCookie');
-
-        $translatorHelper = $this->getMockBuilder(TranslatorHelper::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['setCharset', 'trans', 'getJsLang'])
-            ->getMock();
-
-        $translatorHelper->expects($this->any())
-            ->method('setCharset');
-
-        $translatorHelper->expects($this->any())
-            ->method('trans');
-
-        $translatorHelper->expects($this->any())
-            ->method('getJsLang');
 
         $templateHelper = $this->getMockBuilder(DelegatingEngine::class)
             ->disableOriginalConstructor()
@@ -186,8 +121,7 @@ abstract class MauticFunctionalTestCase extends WebTestCase
             });
 
         $this->container->set('mautic.helper.cookie', $cookieHelper);
-        $this->container->set('templating.helper.translator', $translatorHelper);
-        $this->container->set('mautic.helper.core_parameters', $coreParametersHelper);
+        $this->container->set('translator', $this->container->get('translator.default'));
         //uncomment to develop tests faster
 //        $this->container->set('templating', $templateHelper);
     }

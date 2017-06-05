@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Model;
 
-use Doctrine\Common\Collections\Criteria;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventDailySendLog;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -35,12 +34,9 @@ class EventDailySendModel extends CommonFormModel
      */
     public function getCurrentDayLog(Event $event)
     {
-        $log = $event->getDailySendLog()->matching(
-            Criteria::create()
-                ->where(
-                    Criteria::expr()->eq('date', $this->getDate())
-                )
-        )->first();
+        $log = $this->getRepository()->findOneBy([
+            'date' => $this->getDate(),
+        ]);
 
         return $log ? $log : $this->createLog($event);
     }

@@ -1358,6 +1358,9 @@ class EventModel extends CommonFormModel
 
                         // Prevent path if lead has already gone down this path
                         if (!isset($leadLog[$lead->getId()]) || !array_key_exists($parentId, $leadLog[$lead->getId()])) {
+                            if ($leadLog[$lead->getId()][$grandParentId]['is_queued']) {
+                                continue;
+                            }
 
                             // Get date to compare against
                             $utcDateString = ($grandParentId) ? $leadLog[$lead->getId()][$grandParentId]['date_triggered']

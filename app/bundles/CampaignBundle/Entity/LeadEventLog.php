@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead as MauticLead;
 
 /**
  * Class LeadEventLog.
@@ -122,7 +123,10 @@ class LeadEventLog
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->addLead(false, 'CASCADE');
+        $builder->createManyToOne('lead', MauticLead::class)
+            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
+            ->cascadePersist()
+            ->build();
 
         $builder->addField('rotation', 'integer');
 

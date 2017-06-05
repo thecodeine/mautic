@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\EmailBundle\Tests\EventListener;
+namespace Mautic\CampaignBundle\Tests;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -16,61 +16,60 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-/**
- * Class CampaignSubscriberTest.
- */
-class CampaignSubscriberTest extends MauticFunctionalTestCase
+class CampaignTest extends MauticFunctionalTestCase
 {
-    public function testOnCampaignTriggerWithoutLimitsAction()
+    public function testQueuedNegativeEvents()
     {
-        $users = 5;
-        $this->loadFixtures(0, 0, $users);
+        $this->loadFixtures();
 
         $this->executeCommand();
 
-        $logs = $this->em->getRepository(LeadEventLog::class)->findBy([
-            'isQueued' => 0,
-        ]);
+        $this->travelInTime();
 
-        $this->assertEquals(count($logs), $users);
-    }
-
-    public function testOnCampaignTriggerWithLimitsAction()
-    {
-        $dailyLimit = 2;
-        $users      = 5;
-        $this->loadFixtures(0, $dailyLimit, $users);
         $this->executeCommand();
 
-        $queuedLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
-            'isQueued' => 1,
-        ]);
-
-        $sendLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
-            'isQueued' => 0,
-        ]);
-
-        $this->assertEquals(count($queuedLogs), ($users - $dailyLimit));
-        $this->assertEquals(count($sendLogs), $dailyLimit);
+        $this->assertCount(40, $this->em->getRepository(LeadEventLog::class)->findAll());
     }
 
-    public function testOnCampaignTriggerQueuedAction()
+    private function executeCommand()
     {
-        $sendEmails = 3;
-        $dailyLimit = 3;
-        $users      = 3;
+        $kernel      = $this->container->get('kernel');
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
 
-        $this->loadFixtures($sendEmails, $dailyLimit, $users);
-        $this->executeCommand();
-
-        $logs = $this->em->getRepository(LeadEventLog::class)->findBy([
-            'isQueued' => 1,
+        $input = new ArrayInput([
+            'command' => 'mautic:campaign:trigger',
         ]);
 
-        $this->assertEquals(count($logs), $users);
+        $output = new BufferedOutput();
+        $application->run($input, $output);
     }
 
-    private function loadFixtures($sendEmails = 0, $dailyMax = 0, $users = 20)
+    private function travelInTime($period = 'P2D')
+    {
+        //mote two days ahead
+        $campainLeadEventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
+        $date                 = new \DateTime();
+        $date->sub(new \DateInterval($period));
+
+        foreach ($campainLeadEventLogs as $campainLeadEventLog) {
+            $campainLeadEventLog->setDateTriggered($date);
+            $this->em->persist($campainLeadEventLog);
+            $this->em->flush();
+        }
+
+        $campaignEventDailySendLogs = $this->em->getRepository(EventDailySendLog::class)->findAll();
+
+        foreach ($campaignEventDailySendLogs as $campaignEventDailySendLog) {
+            $date = new \DateTime();
+            $date->sub(new \DateInterval($period));
+            $campaignEventDailySendLog->setDate($date);
+            $this->em->persist($campaignEventDailySendLog);
+            $this->em->flush();
+        }
+    }
+
+    private function loadFixtures()
     {
         $date = new \DateTime();
 
@@ -98,7 +97,7 @@ class CampaignSubscriberTest extends MauticFunctionalTestCase
 
         $this->em->persist($email);
 
-        for ($i = 0; $i < $users; ++$i) {
+        for ($i = 0; $i < 20; ++$i) {
             $lead = new Lead();
             $lead->setFirstname('Firstname_'.$i);
             $lead->setLastname('Lastname_'.$i);
@@ -135,7 +134,7 @@ class CampaignSubscriberTest extends MauticFunctionalTestCase
         $event->setEventType('action');
         $event->setOrder(1);
         $event->setProperties([
-            'daily_max_limit' => $dailyMax,
+            'daily_max_limit' => '10',
             'email'           => '1',
             'email_type'      => 'transactional',
             'priority'        => 2,
@@ -147,31 +146,46 @@ class CampaignSubscriberTest extends MauticFunctionalTestCase
         $event->setTempId('newd282fcc139867d6ce915d8d9787f1464f8d100ae');
         $event->setChannel('email');
         $event->setChannelId(1);
+
         $this->em->persist($event);
 
-        if ($sendEmails) {
-            $dailyLog = new EventDailySendLog();
-            $dailyLog->setSentCount($sendEmails);
-            $dailyLog->setDate($date);
-            $dailyLog->setEvent($event);
+        $event1 = new Event();
+        $event1->setCampaign($campaign);
+        $event1->setParent($event);
+        $event1->setName('Opens email');
+        $event1->setType('email.open');
+        $event1->setEventType('decision');
+        $event1->setOrder(2);
+        $event1->setProperties([]);
+        $event1->setTriggerInterval(0);
+        $event1->setTempId('newf0a432f68c88369f622c4526f6f5890b0bc620a6');
 
-            $this->em->persist($dailyLog);
-        }
+        $this->em->persist($event1);
+
+        $event2 = new Event();
+        $event2->setCampaign($campaign);
+        $event2->setParent($event1);
+        $event2->setDecisionPath('no');
+        $event2->setName('Send Email');
+        $event2->setType('email.send');
+        $event2->setEventType('action');
+        $event2->setOrder(3);
+        $event2->setProperties([
+            'daily_max_limit' => '10',
+            'email'           => '1',
+            'email_type'      => 'transactional',
+            'priority'        => 2,
+            'attempts'        => 3,
+        ]);
+        $event2->setTriggerInterval(1);
+        $event2->setTriggerIntervalUnit('d');
+        $event2->setTriggerMode('interval');
+        $event2->setTempId('newe700d7143b78ffa779dcefd66249932a7291685c');
+        $event2->setChannel('email');
+        $event2->setChannelId(1);
+
+        $this->em->persist($event2);
 
         $this->em->flush();
-    }
-
-    private function executeCommand()
-    {
-        $kernel      = $this->container->get('kernel');
-        $application = new Application($kernel);
-        $application->setAutoExit(false);
-
-        $input = new ArrayInput([
-            'command' => 'mautic:campaign:trigger',
-        ]);
-
-        $output = new BufferedOutput();
-        $application->run($input, $output);
     }
 }

@@ -51,4 +51,9 @@ class RepositoryMock
     {
         return $this->campaignEvents;
     }
+
+    public function findOneBy()
+    {
+        return null;
+    }
 }

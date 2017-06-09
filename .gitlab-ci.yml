@@ -106,42 +106,42 @@ build-package:
       - packages/*
     expire_in: 3 mos
 
-build-test:
-  <<: *build-and-push
-  <<: *dependencies-prepare
-  <<: *tags
-  stage: build
-  variables:
-    BUILD_TASK: $CI_JOB_NAME
-    SYMFONY_ENV: test
-    GIT_STRATEGY: clone
-  before_script:
-    - export IMAGE="${BUILD_IMAGE:-$DOCKER_ENV_BUILD_IMAGE}-test"
-  only:
-    - branches
-
-.dependencies-test: &dependencies-test
-  before_script:
-    - *docker-login
-    - export TEST_IMAGE="${BUILD_IMAGE:-$DOCKER_ENV_BUILD_IMAGE}-test"
-    - docker pull $TEST_IMAGE
-
-.test: &test
-  <<: *dependencies-test
-  <<: *dependencies-docker-compose
-  <<: *tags
-  stage: test
-  script:
-    - export IMAGE=$TEST_IMAGE
-    - export MAKE_TASK=$CI_JOB_NAME
-    - ./docker-test.sh $ARGS
-  only:
-    - branches
-
-test:
-  <<: *test
-  variables:
-    ARGS: app
+#build-test:
+#  <<: *build-and-push
+#  <<: *dependencies-prepare
+#  <<: *tags
+#  stage: build
+#  variables:
+#    BUILD_TASK: $CI_JOB_NAME
+#    SYMFONY_ENV: test
+#    GIT_STRATEGY: clone
+#  before_script:
+#    - export IMAGE="${BUILD_IMAGE:-$DOCKER_ENV_BUILD_IMAGE}-test"
+#  only:
+#    - branches
+#
+#.dependencies-test: &dependencies-test
+#  before_script:
+#    - *docker-login
+#    - export TEST_IMAGE="${BUILD_IMAGE:-$DOCKER_ENV_BUILD_IMAGE}-test"
+#    - docker pull $TEST_IMAGE
+#
+#.test: &test
+#  <<: *dependencies-test
+#  <<: *dependencies-docker-compose
+#  <<: *tags
+#  stage: test
+#  script:
+#    - export IMAGE=$TEST_IMAGE
+#    - export MAKE_TASK=$CI_JOB_NAME
+#    - ./docker-test.sh $ARGS
+#  only:
+#    - branches
+#
+#test:
+#  <<: *test
+#  variables:
+#    ARGS: app
 
 .release: &release
   <<: *build-and-push

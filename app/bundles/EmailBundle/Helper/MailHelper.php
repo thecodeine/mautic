@@ -200,6 +200,8 @@ class MailHelper
         'charset'     => null,
     ];
 
+    private $copies = [];
+
     /**
      * Cache for lead owners.
      *
@@ -1796,8 +1798,6 @@ class MailHelper
      */
     public function createEmailStat($persist = true, $emailAddress = null, $listId = null)
     {
-        static $copies = [];
-
         //create a stat
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
@@ -1839,7 +1839,7 @@ class MailHelper
 
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
         $id = (null !== $this->email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
-        if (!isset($copies[$id])) {
+        if (!isset($this->copies[$id])) {
             $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
 
             $copy        = $emailModel->getCopyRepository()->findByHash($hash);
@@ -1854,12 +1854,12 @@ class MailHelper
             }
 
             if ($copy || $copyCreated) {
-                $copies[$id] = $hash;
+                $this->copies[$id] = $hash;
             }
         }
 
-        if (isset($copies[$id])) {
-            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
+        if (isset($this->copies[$id])) {
+            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $this->copies[$id]));
         }
 
         if ($persist) {

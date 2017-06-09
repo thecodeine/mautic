@@ -642,7 +642,8 @@ class CampaignController extends AbstractStandardFormController
                 $eventLogRepo      = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
                 $events            = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
                 $leadCount         = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
-                $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
+                $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true);
+                $campaignLogQueuedCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), true, false, false);
                 $sortedEvents      = [
                     'decision'  => [],
                     'action'    => [],
@@ -650,18 +651,23 @@ class CampaignController extends AbstractStandardFormController
                 ];
 
                 foreach ($events as $event) {
-                    $event['logCount']   =
-                    $event['percent']    =
-                    $event['yesPercent'] =
-                    $event['noPercent']  = 0;
+                    $event['logCount']    =
+                    $event['queuedCount'] =
+                    $event['leadCount']   =
+                    $event['percent']     =
+                    $event['yesPercent']  =
+                    $event['noPercent']   = 0;
+                    $event['leadCount']   = $leadCount;
+                    $event['queuedCount'] = array_sum($campaignLogQueuedCounts[$event['id']]);
+                    $event['percentQueued'] = $leadCount ? round($event['queuedCount'] / $leadCount * 100) : 0;
 
                     if (isset($campaignLogCounts[$event['id']])) {
                         $event['logCount'] = array_sum($campaignLogCounts[$event['id']]);
 
                         if ($leadCount) {
-                            $event['percent']    = round(($event['logCount'] / $leadCount) * 100);
-                            $event['yesPercent'] = round(($campaignLogCounts[$event['id']][1] / $leadCount) * 100);
-                            $event['noPercent']  = round(($campaignLogCounts[$event['id']][0] / $leadCount) * 100);
+                            $event['percent']       = round(($event['logCount'] / $leadCount) * 100);
+                            $event['yesPercent']    = round(($campaignLogCounts[$event['id']][1] / $leadCount) * 100);
+                            $event['noPercent']     = round(($campaignLogCounts[$event['id']][0] / $leadCount) * 100);
                         }
                     }
 

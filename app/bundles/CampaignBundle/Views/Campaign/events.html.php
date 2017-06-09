@@ -28,7 +28,14 @@
                     <h5 class="fw-sb text-primary mb-xs">
                         <?php echo $event['name']; ?>
                         <?php if ('action' !== $event['eventType']): ?>
-                        <small class="text-muted"><?php echo $event['percent']; ?>%</small>
+                            <small class="text-muted"><?php echo $event['percent']; ?>%</small>
+                        <?php endif; ?>
+                        <?php if ($event['type'] == 'email.send') : ?>
+                            <small>
+                                ( <?php echo $event['logCount']; ?> <?php echo $view['translator']->trans('mautic.campaign.event.actions.sent'); ?> /
+                                <?php echo $event['queuedCount']; ?> <?php echo $view['translator']->trans('mautic.campaign.event.actions.queued'); ?> /
+                                <?php echo $event['leadCount']; ?> <?php echo $view['translator']->trans('mautic.campaign.event.actions.all'); ?> )
+                            </small>
                         <?php endif; ?>
                     </h5>
                     <h6 class="text-white dark-sm"><?php echo $event['description']; ?></h6>

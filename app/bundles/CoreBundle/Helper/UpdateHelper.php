@@ -120,28 +120,28 @@ class UpdateHelper
             }
         }
 
-        // Before processing the update data, send up our metrics
-        try {
-            // Generate a unique instance ID for the site
-            $instanceId = hash('sha1', $this->factory->getParameter('secret_key').'Mautic'.$this->factory->getParameter('db_driver'));
+//        // Before processing the update data, send up our metrics
+//        try {
+//            // Generate a unique instance ID for the site
+//            $instanceId = hash('sha1', $this->factory->getParameter('secret_key').'Mautic'.$this->factory->getParameter('db_driver'));
 
-            $data = array_map(
-                'trim',
-                [
-                    'application'   => 'Mautic',
-                    'version'       => $this->factory->getVersion(),
-                    'phpVersion'    => PHP_VERSION,
-                    'dbDriver'      => $this->factory->getParameter('db_driver'),
-                    'serverOs'      => $this->getServerOs(),
-                    'instanceId'    => $instanceId,
-                    'installSource' => $this->factory->getParameter('install_source', 'Mautic'),
-                ]
-            );
+//            $data = array_map(
+//                'trim',
+//                [
+//                    'application'   => 'Mautic',
+//                    'version'       => $this->factory->getVersion(),
+//                    'phpVersion'    => PHP_VERSION,
+//                    'dbDriver'      => $this->factory->getParameter('db_driver'),
+//                    'serverOs'      => $this->getServerOs(),
+//                    'instanceId'    => $instanceId,
+//                    'installSource' => $this->factory->getParameter('install_source', 'Mautic'),
+//                ]
+//            );
 
-            $this->connector->post('https://updates.mautic.org/stats/send', $data, [], 10);
-        } catch (\Exception $exception) {
-            // Not so concerned about failures here, move along
-        }
+//            $this->connector->post('https://updates.mautic.org/stats/send', $data, [], 10);
+//        } catch (\Exception $exception) {
+//            // Not so concerned about failures here, move along
+//        }
 
         // Get the update data
         try {
@@ -154,7 +154,7 @@ class UpdateHelper
                 ]
             );
 
-            $data   = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData, [], 10);
+            $data   = $this->connector->post($this->factory->getParameter('update_url'), $appData, [], 10);
             $update = json_decode($data->body);
         } catch (\Exception $exception) {
             // Log the error

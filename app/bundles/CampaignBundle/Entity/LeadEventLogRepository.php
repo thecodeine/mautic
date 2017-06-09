@@ -83,6 +83,7 @@ class LeadEventLogRepository extends CommonRepository
                     ll.metadata,
                     e.type,
                     ll.is_scheduled as isScheduled,
+                    ll.is_queued as isQueued,
                     ll.trigger_date as triggerDate,
                     ll.channel,
                     ll.channel_id as channel_id
@@ -113,6 +114,13 @@ class LeadEventLogRepository extends CommonRepository
                 );
             }
             $query->setParameter('scheduled', $options['scheduledState'], 'boolean');
+        }
+
+        if (isset($options['queuedState']) && $options['queuedState']) {
+            $query->andWhere(
+                $query->expr()->eq('ll.is_queued', ':queued')
+            );
+            $query->setParameter('queued', $options['queuedState'], 'boolean');
         }
 
         if (isset($options['search']) && $options['search']) {
@@ -212,7 +220,7 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true)
+    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true, $excludeQueued = true)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
@@ -247,6 +255,16 @@ class LeadEventLogRepository extends CommonRepository
             );
         }
 
+        if ($excludeQueued) {
+            $expr->add(
+                $q->expr()->eq('o.is_queued', ':false')
+            );
+        } else {
+            $expr->add(
+                $q->expr()->eq('o.is_queued', ':true')
+            );
+        }
+
         // Exclude failed events
         $failedSq = $this->_em->getConnection()->createQueryBuilder();
         $failedSq->select('null')
@@ -259,8 +277,9 @@ class LeadEventLogRepository extends CommonRepository
         );
 
         $q->where($expr)
-          ->setParameter('false', false, 'boolean')
-          ->groupBy($groupBy);
+            ->setParameter('false', false, 'boolean')
+            ->setParameter('true', true, 'boolean')
+            ->groupBy($groupBy);
 
         $results = $q->execute()->fetchAll();
 

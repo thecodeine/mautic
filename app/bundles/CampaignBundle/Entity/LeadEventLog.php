@@ -58,6 +58,11 @@ class LeadEventLog
     private $isScheduled = false;
 
     /**
+     * @var bool
+     */
+    private $isQueued = false;
+
+    /**
      * @var null|\DateTime
      */
     private $triggerDate;
@@ -124,7 +129,10 @@ class LeadEventLog
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->addLead(false, 'CASCADE');
+        $builder->createManyToOne('lead', LeadEntity::class)
+            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
+            ->cascadePersist()
+            ->build();
 
         $builder->addField('rotation', 'integer');
 
@@ -141,6 +149,10 @@ class LeadEventLog
 
         $builder->createField('isScheduled', 'boolean')
             ->columnName('is_scheduled')
+            ->build();
+
+        $builder->createField('isQueued', 'boolean')
+            ->columnName('is_queued')
             ->build();
 
         $builder->createField('triggerDate', 'datetime')
@@ -305,6 +317,26 @@ class LeadEventLog
         if (!$this->campaign) {
             $this->setCampaign($event->getCampaign());
         }
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsQueued()
+    {
+        return $this->isQueued;
+    }
+
+    /**
+     * @param bool $isQueued
+     *
+     * @return $this
+     */
+    public function setIsQueued($isQueued)
+    {
+        $this->isQueued = $isQueued;
 
         return $this;
     }

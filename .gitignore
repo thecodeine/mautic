@@ -1,7 +1,10 @@
 .*
+.github
 !.gitignore
 !.htaccess
 !.gitkeep
+!.dockerignore
+!.gitlab-ci.yml
 /composer.phar
 
 /app/bootstrap*
@@ -52,6 +55,7 @@
 !/media/images/favicon.ico
 !/media/images/mautic_logo*
 !/media/images/.htaccess
+.idea
 
 /plugins/*
 !/plugins/MauticCitrixBundle
@@ -64,6 +68,7 @@
 !/plugins/MauticGmailBundle
 !/plugins/MauticOutlookBundle
 !/plugins/MauticSocialBundle
+!/plugins/TheCodeineEmbedBundle
 !/plugins/index.html
 
 /themes/*

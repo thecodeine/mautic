@@ -234,6 +234,10 @@ return [
                     'mautic.helper.ip_lookup',
                 ],
             ],
+            'mautic.campaign.model.event_daily_send_log' => [
+                'class'     => 'Mautic\CampaignBundle\Model\EventDailySendModel',
+                'arguments' => [],
+            ],
         ],
     ],
     'parameters' => [

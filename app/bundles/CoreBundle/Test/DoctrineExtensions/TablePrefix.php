@@ -45,7 +45,7 @@ class TablePrefix
             return;
         }
 
-        $indexes = &$table[$key];
+        $indexes    = &$table[$key];
         $newIndexes = [];
 
         foreach ($indexes as $name => $index)

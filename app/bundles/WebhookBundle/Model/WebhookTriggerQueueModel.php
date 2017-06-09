@@ -26,7 +26,7 @@ class WebhookTriggerQueueModel extends CommonFormModel
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->queueMode = $coreParametersHelper->getParameter('queue_mode');
-        $this->siteUrl = $coreParametersHelper->getParameter('site_url');
+        $this->siteUrl   = $coreParametersHelper->getParameter('site_url');
     }
 
     public function getQueueMode()

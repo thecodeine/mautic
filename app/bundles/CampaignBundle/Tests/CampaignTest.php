@@ -32,7 +32,7 @@ class CampaignTest extends MauticWebTestCase
     {
         //mote two days ahead
         $campainLeadEventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        $date = new \DateTime();
+        $date                 = new \DateTime();
         $date->sub(new \DateInterval($period));
 
         foreach ($campainLeadEventLogs as $campainLeadEventLog) {

@@ -26,7 +26,7 @@ class CampaignSubscriberTest extends MauticWebTestCase
         $this->executeCommand('mautic:campaign:trigger');
 
         $logs = $this->em->getRepository(LeadEventLog::class)->findBy([
-            'isQueued' => 0
+            'isQueued' => 0,
         ]);
 
         $this->assertEquals(count($logs), $users);
@@ -40,11 +40,11 @@ class CampaignSubscriberTest extends MauticWebTestCase
         $this->executeCommand('mautic:campaign:trigger');
 
         $queuedLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
-            'isQueued' => 1
+            'isQueued' => 1,
         ]);
 
         $sendLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
-            'isQueued' => 0
+            'isQueued' => 0,
         ]);
 
         $this->assertEquals(count($queuedLogs), ($users - $dailyLimit));

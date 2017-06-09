@@ -35,7 +35,7 @@ class EventDailySendModel extends CommonFormModel
     public function getCurrentDayLog(Event $event)
     {
         $log = $this->getRepository()->findOneBy([
-            'date' => $this->getDate()
+            'date' => $this->getDate(),
         ]);
 
         return $log ? $log : $this->createLog($event);

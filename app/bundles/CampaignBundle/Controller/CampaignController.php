@@ -658,7 +658,7 @@ class CampaignController extends AbstractStandardFormController
                     $event['yesPercent']  =
                     $event['noPercent']   = 0;
                     $event['leadCount']   = $leadCount;
-                    $event['queuedCount'] = array_sum($campaignLogQueuedCounts[$event['id']]);
+                    $event['queuedCount']   = array_sum($campaignLogQueuedCounts[$event['id']]);
                     $event['percentQueued'] = $leadCount ? round($event['queuedCount'] / $leadCount * 100) : 0;
 
                     if (isset($campaignLogCounts[$event['id']])) {

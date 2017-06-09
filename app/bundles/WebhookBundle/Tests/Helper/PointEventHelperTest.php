@@ -21,8 +21,8 @@ class PointEventHelperTest extends \PHPUnit_Framework_TestCase
     public function testTriggerWebhook()
     {
         $iterations = 4;
-        $helper = new PointEventHelper();
-        $event  = [
+        $helper     = new PointEventHelper();
+        $event      = [
             'id'      => 1,
             'trigger' => [
                 'id' => 1,

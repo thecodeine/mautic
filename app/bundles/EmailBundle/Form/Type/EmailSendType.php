@@ -45,10 +45,10 @@ class EmailSendType extends AbstractType
                 'daily_max_limit',
                 'text',
                 [
-                    'label' => 'mautic.email.send.daily_max_limit',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr' => ['class' => 'form-control'],
-                    'data' => isset($options['data']['daily_max_limit']) ? $options['data']['daily_max_limit'] : 0,
+                    'label'       => 'mautic.email.send.daily_max_limit',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => ['class' => 'form-control'],
+                    'data'        => isset($options['data']['daily_max_limit']) ? $options['data']['daily_max_limit'] : 0,
                     'constraints' => [
                         new Range(
                             ['min' => 0]

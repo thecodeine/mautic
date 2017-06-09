@@ -13,7 +13,7 @@ class EventDailySendLog
     protected $id;
 
     /**
-     * @var Date
+     * @var \Datetime
      */
     private $date;
 
@@ -100,7 +100,7 @@ class EventDailySendLog
     /**
      * @param \DateTime $date
      *
-     * @return EventOption
+     * @return EventDailySendLog
      */
     public function setDate(\DateTime $date)
     {

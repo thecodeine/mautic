@@ -160,7 +160,7 @@ class EventModelTest extends KernelTestCase
             'triggerMode' => 'immediate',
         ];
         $campaign      = new Campaign();
-        $lead          = new Lead(1);
+        $lead          = new Lead();
         $eventSettings = [
             'eventType' => [
                 'type' => 'type',

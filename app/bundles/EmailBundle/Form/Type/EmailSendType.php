@@ -215,8 +215,8 @@ class EmailSendType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'with_email_types' => false,
-                'with_daily_max_limit' => false
+                'with_email_types'     => false,
+                'with_daily_max_limit' => false,
             ]
         );
 

@@ -56,7 +56,6 @@ $container->loadFromExtension('doctrine', [
     ],
 ]);
 
-
 $container->loadFromExtension('monolog', [
     'channels' => [
         'mautic',

@@ -5,11 +5,11 @@ namespace Mautic\CampaignBundle\Tests;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventDailySendLog;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 
@@ -36,7 +36,6 @@ class CampaignTest extends MauticWebTestCase
         $date->sub(new \DateInterval($period));
 
         foreach ($campainLeadEventLogs as $campainLeadEventLog) {
-
             $campainLeadEventLog->setDateTriggered($date);
             $this->em->persist($campainLeadEventLog);
             $this->em->flush();
@@ -44,7 +43,7 @@ class CampaignTest extends MauticWebTestCase
 
         $campaignEventDailySendLogs = $this->em->getRepository(EventDailySendLog::class)->findAll();
 
-        foreach($campaignEventDailySendLogs as $campaignEventDailySendLog) {
+        foreach ($campaignEventDailySendLogs as $campaignEventDailySendLog) {
             $date = new \DateTime();
             $date->sub(new \DateInterval($period));
             $campaignEventDailySendLog->setDate($date);
@@ -80,11 +79,11 @@ class CampaignTest extends MauticWebTestCase
 
         $this->em->persist($email);
 
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 20; ++$i) {
             $lead = new Lead();
-            $lead->setFirstname('Firstname_' . $i);
-            $lead->setLastname('Lastname_' . $i);
-            $lead->setEmail($i . '_test@test.com');
+            $lead->setFirstname('Firstname_'.$i);
+            $lead->setLastname('Lastname_'.$i);
+            $lead->setEmail($i.'_test@test.com');
             $lead->setPhone('555-666-777');
 
             $this->em->persist($lead);
@@ -106,7 +105,6 @@ class CampaignTest extends MauticWebTestCase
             $campaignLead->setRotation(1);
 
             $this->em->persist($campaignLead);
-
         }
 
         $this->em->persist($campaign);
@@ -119,10 +117,10 @@ class CampaignTest extends MauticWebTestCase
         $event->setOrder(1);
         $event->setProperties([
             'daily_max_limit' => '10',
-            'email' => '1',
-            'email_type' => 'transactional',
-            'priority' => 2,
-            'attempts' => 3
+            'email'           => '1',
+            'email_type'      => 'transactional',
+            'priority'        => 2,
+            'attempts'        => 3,
         ]);
         $event->setTriggerInterval(1);
         $event->setTriggerIntervalUnit('d');
@@ -156,10 +154,10 @@ class CampaignTest extends MauticWebTestCase
         $event2->setOrder(3);
         $event2->setProperties([
             'daily_max_limit' => '10',
-            'email' => '1',
-            'email_type' => 'transactional',
-            'priority' => 2,
-            'attempts' => 3
+            'email'           => '1',
+            'email_type'      => 'transactional',
+            'priority'        => 2,
+            'attempts'        => 3,
         ]);
         $event2->setTriggerInterval(1);
         $event2->setTriggerIntervalUnit('d');

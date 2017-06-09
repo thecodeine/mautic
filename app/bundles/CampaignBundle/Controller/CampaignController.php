@@ -639,25 +639,25 @@ class CampaignController extends AbstractStandardFormController
                 $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
 
                 /** @var LeadEventLogRepository $eventLogRepo */
-                $eventLogRepo      = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-                $events            = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
-                $leadCount         = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
-                $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true);
+                $eventLogRepo            = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+                $events                  = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
+                $leadCount               = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
+                $campaignLogCounts       = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true);
                 $campaignLogQueuedCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), true, false, false);
-                $sortedEvents      = [
+                $sortedEvents            = [
                     'decision'  => [],
                     'action'    => [],
                     'condition' => [],
                 ];
 
                 foreach ($events as $event) {
-                    $event['logCount']    =
-                    $event['queuedCount'] =
-                    $event['leadCount']   =
-                    $event['percent']     =
-                    $event['yesPercent']  =
-                    $event['noPercent']   = 0;
-                    $event['leadCount']   = $leadCount;
+                    $event['logCount']      =
+                    $event['queuedCount']   =
+                    $event['leadCount']     =
+                    $event['percent']       =
+                    $event['yesPercent']    =
+                    $event['noPercent']     = 0;
+                    $event['leadCount']     = $leadCount;
                     $event['queuedCount']   = array_sum($campaignLogQueuedCounts[$event['id']]);
                     $event['percentQueued'] = $leadCount ? round($event['queuedCount'] / $leadCount * 100) : 0;
 
@@ -665,9 +665,9 @@ class CampaignController extends AbstractStandardFormController
                         $event['logCount'] = array_sum($campaignLogCounts[$event['id']]);
 
                         if ($leadCount) {
-                            $event['percent']       = round(($event['logCount'] / $leadCount) * 100);
-                            $event['yesPercent']    = round(($campaignLogCounts[$event['id']][1] / $leadCount) * 100);
-                            $event['noPercent']     = round(($campaignLogCounts[$event['id']][0] / $leadCount) * 100);
+                            $event['percent']    = round(($event['logCount'] / $leadCount) * 100);
+                            $event['yesPercent'] = round(($campaignLogCounts[$event['id']][1] / $leadCount) * 100);
+                            $event['noPercent']  = round(($campaignLogCounts[$event['id']][0] / $leadCount) * 100);
                         }
                     }
 

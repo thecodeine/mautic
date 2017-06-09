@@ -43,11 +43,11 @@ class MauticWebTestCase extends AbstractMauticWebTestCase
         ]);
 
         $this->executeCommand('doctrine:database:create', [
-            '--env'   => 'test',
+            '--env' => 'test',
         ]);
 
         $this->executeCommand('doctrine:schema:create', [
-            '--env'   => 'test',
+            '--env' => 'test',
         ]);
 
         $this->installDatabaseFixtures();

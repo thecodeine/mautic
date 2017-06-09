@@ -16,7 +16,7 @@ class PointEventHelperTest extends \PHPUnit_Framework_TestCase
 {
     private $processedWebhooks = [];
     private $savedWebhooks     = [];
-    private $siteUrl = 'http://test.com';
+    private $siteUrl           = 'http://test.com';
 
     public function testTriggerWebhook()
     {
@@ -32,7 +32,7 @@ class PointEventHelperTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $expectedEmail = 'test@test.com';
+        $expectedEmail  = 'test@test.com';
         $expectedPoints = 10;
 
         $expectedPayload = [
@@ -46,24 +46,24 @@ class PointEventHelperTest extends \PHPUnit_Framework_TestCase
         $lead->setEmail($expectedEmail);
         $lead->setPoints($expectedPoints);
 
-        $commandProcessFactory = $this->getMockMauticFactory('command_process');
+        $commandProcessFactory   = $this->getMockMauticFactory('command_process');
         $immediateProcessFactory = $this->getMockMauticFactory('immediate_process');
 
-        for ($i = 0; $i < $iterations; $i++) {
+        for ($i = 0; $i < $iterations; ++$i) {
             $this->triggerAndTestWebhookHelper($helper, $event, $lead, $commandProcessFactory, true);
         }
 
         $this->assertEquals($iterations, sizeof($this->savedWebhooks));
         $this->assertEquals(0, sizeof($this->processedWebhooks));
 
-        for ($i = 0; $i < $iterations; $i++) {
+        for ($i = 0; $i < $iterations; ++$i) {
             $this->triggerAndTestWebhookHelper($helper, $event, $lead, $immediateProcessFactory, true);
         }
 
         $this->assertEquals($iterations, sizeof($this->savedWebhooks));
         $this->assertEquals($iterations, sizeof($this->processedWebhooks));
 
-        for ($i = 0; $i < $iterations; $i++) {
+        for ($i = 0; $i < $iterations; ++$i) {
             $this->assertEquals($expectedPayload, $this->processedWebhooks[$i]->getPayload());
             $this->assertEquals($expectedPayload, $this->savedWebhooks[$i]->getPayload());
         }

@@ -2,6 +2,7 @@
 !.gitignore
 !.htaccess
 !.gitkeep
+!.gitlab-ci.yml
 /composer.phar
 
 /app/bootstrap*

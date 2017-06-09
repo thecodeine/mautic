@@ -81,6 +81,8 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         require_once $file;
 
+        dump($file);
+
         return $class;
     }
 

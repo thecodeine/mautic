@@ -141,7 +141,7 @@ build-test:
 test:
   <<: *test
   variables:
-    ARGS: --no-deps app
+    ARGS: app
 
 .release: &release
   <<: *build-and-push

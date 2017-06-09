@@ -32,9 +32,8 @@ if [[ -n $IMAGE ]]; then
 	OPTIONS="$OPTIONS --no-build"
 fi
 
-compose up -d $OPTIONS db
+compose up -d $OPTIONS $@
 sleep 5
-compose up -d $OPTIONS app
 
 if [ $? -ne 0 ] ; then
 	printf "${RED}Docker Compose Failed${NC}\n"

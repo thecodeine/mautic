@@ -2,10 +2,10 @@
 
 namespace Mautic\LeadBundle\Tests;
 
-use Mautic\CoreBundle\Test\AbstractMauticWebTestCase;
+use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 
-class ListModelFunctionalTest extends AbstractMauticWebTestCase
+class ListModelFunctionalTest extends MauticWebTestCase
 {
     public function testSegmentCountIsCorrect()
     {

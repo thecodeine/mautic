@@ -7,7 +7,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventDailySendLog;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -16,14 +16,14 @@ use Mautic\LeadBundle\Entity\ListLead;
 /**
  * Class CampaignSubscriberTest.
  */
-class CampaignSubscriberTest extends MauticWebTestCase
+class CampaignSubscriberTest extends MauticMysqlTestCase
 {
     public function testOnCampaignTriggerWithoutLimitsAction()
     {
         $users = 5;
         $this->loadData(0, 0, $users);
 
-        $this->executeCommand('mautic:campaign:trigger');
+        $this->runCommand('mautic:campaign:trigger');
 
         $logs = $this->em->getRepository(LeadEventLog::class)->findBy([
             'isQueued' => 0,
@@ -37,7 +37,7 @@ class CampaignSubscriberTest extends MauticWebTestCase
         $dailyLimit = 2;
         $users      = 5;
         $this->loadData(0, $dailyLimit, $users);
-        $this->executeCommand('mautic:campaign:trigger');
+        $this->runCommand('mautic:campaign:trigger');
 
         $queuedLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
             'isQueued' => 1,
@@ -58,7 +58,7 @@ class CampaignSubscriberTest extends MauticWebTestCase
         $users      = 3;
 
         $this->loadData($sendEmails, $dailyLimit, $users);
-        $this->executeCommand('mautic:campaign:trigger');
+        $this->runCommand('mautic:campaign:trigger');
 
         $logs = $this->em->getRepository(LeadEventLog::class)->findBy([
             'isQueued' => 1,

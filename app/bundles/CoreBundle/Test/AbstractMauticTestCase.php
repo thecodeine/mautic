@@ -11,10 +11,10 @@ use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Console\Input\ArrayInput;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
@@ -144,8 +144,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application = new Application($kernel);
         $application->setAutoExit(false);
 
-        $input = new ArrayInput($params);
-
+        $input  = new ArrayInput($params);
         $output = new BufferedOutput();
         $application->run($input, $output);
     }

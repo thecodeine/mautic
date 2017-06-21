@@ -290,6 +290,15 @@ class EventController extends CommonFormController
                         $formData       = $form->getData();
                         $event          = array_merge($event, $formData);
 
+                        /*
+                         * this is ugly quickfix, real bug is in file
+                         * Mautic\CoreBundle\Form\Type\PropertiesTrait where author is adding whole form to
+                         * properties
+                         */
+                        if (isset($event['properties']['dailySendLog'])) {
+                            unset($event['properties']['dailySendLog']);
+                        }
+
                         if (empty($event['name'])) {
                             //set it to the event default
                             $event['name'] = $this->get('translator')->trans($event['settings']['label']);

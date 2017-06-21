@@ -7,23 +7,23 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventDailySendLog;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 
-class CampaignTest extends MauticWebTestCase
+class CampaignTest extends MauticMysqlTestCase
 {
     public function testQueuedNegativeEvents()
     {
         $this->loadData();
 
-        $this->executeCommand('mautic:campaign:trigger');
+        $this->runCommand('mautic:campaign:trigger');
 
         $this->travelInTime();
 
-        $this->executeCommand('mautic:campaign:trigger');
+        $this->runCommand('mautic:campaign:trigger');
 
         $this->assertCount(40, $this->em->getRepository(LeadEventLog::class)->findAll());
     }

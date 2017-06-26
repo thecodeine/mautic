@@ -27,7 +27,7 @@ services:
         "
       interval: 5s
       timeout: 3s
-      retries: 10
+      retries: 50
     volumes:
       - db-data:/var/lib/mysql
     restart: on-failure:3

@@ -1,4 +1,4 @@
-Mautic fork by https://MauticDevelopers.com] 
+Mautic fork by https://MauticDevelopers.com
 
 In this fork our team build native integration beetween Mautic and Piperdrive. 
 More information can be found under that repository https://github.com/MauticDevelopers/mautic-embed-plugin

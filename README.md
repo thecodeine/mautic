@@ -1,7 +1,9 @@
 Mautic fork by https://MauticDevelopers.com
 
 In this fork our team build native integration beetween Mautic and Piperdrive. 
-More information can be found under that repository https://github.com/MauticDevelopers/mautic-embed-plugin
+
+Library details
+https://github.com/MauticDevelopers/mautic/tree/pipedrive-integration-plugin/plugins/MauticCrmBundle
 
 If you want to build your custom integration drop us a line at hello@mauticdevelopers.com 
 
@@ -9,6 +11,7 @@ Special thanks to
 https://www.webmecanik.com/ 
 
 Keep calm and do Mautic
+
 MauticDevelopers.com 
 
 Mautic Introduction
